@@ -4,16 +4,15 @@ const { isWebUri } = require('valid-url')
 const logger = require('../logger')
 const store = require('../store')
 
-const bookmarkRouter = express.Router()
+const bookmarksRouter = express.Router()
 const bodyParser = express.json()
 
 
-
-bookmarkRouter
+bookmarksRouter
   .route('/bookmarks')
   .get((req, res) => {
       res
-        .json(store.bookmarks);
+        .json(store.bookmarks)
   })
   .post(bodyParser, (req, res) => {
     for (const field of ['title', 'url', 'rating']) {
@@ -52,16 +51,16 @@ bookmarkRouter
   })
 
   // second card router adds /bookmarks/:bookmark_id
-bookmarkRouter
+bookmarksRouter
   .route('/bookmarks/:bookmark_id')
   .get((req, res) => {
       const { bookmark_id } = req.params;
 
-      const bookmark = bookmarks.find(b => b.id == bookmark_id);
+      const bookmark = store.bookmarks.find(c => c.id == bookmark_id);
 
       //make sure it's a proper bookmark
       if (!bookmark) {
-        logger.error(`Bookmark with id ${id} not found.`);
+        logger.error(`Bookmark with id ${bookmark_id} not found.`);
         return res
           .status(404)
           .send('Bookmark not found');
@@ -72,16 +71,16 @@ bookmarkRouter
   .delete((req, res) => {
       const { bookmark_id } = req.params;
 
-      const bookmarkIndex = bookmarks.findIndex(b => b.id == bookmark_id);
+      const bookmarkIndex = store.bookmarks.findIndex(b => b.id == bookmark_id);
 
       if (bookmarkIndex === -1) {
-          logger.error(`Bookmark with id ${id} not found.`);
+          logger.error(`Bookmark with id ${bookmark_id} not found.`);
           return res 
             .status(404)
-            .send('Not Found');
+            .send('Bookmark Not Found');
       }
 
-      bookmarks.splice(bookmarkIndex, 1);
+      store.bookmarks.splice(bookmarkIndex, 1);
 
       logger.info(`Bookmarks with id ${bookmark_id} deleted.`);
       res
@@ -89,4 +88,4 @@ bookmarkRouter
         .end();
   })
 
-  module.exports = bookmarkRouter
+  module.exports = bookmarksRouter
